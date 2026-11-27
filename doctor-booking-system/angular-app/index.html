@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en" ng-app="doctorBookingApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarePoint | Doctor Booking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="header" ng-controller="NavController">
+    <a class="brand" href="#!/">✚ CarePoint</a>
+    <nav>
+      <a href="#!/">Find Doctors</a>
+      <a href="#!/appointments" ng-if="user">My Appointments</a>
+    </nav>
+    <div class="nav-actions">
+      <span class="nav-user" ng-if="user">Hi, {{user.name.split(' ')[0]}} 👋</span>
+      <a href="#!/auth" class="btn btn-outline" ng-if="!user">Login</a>
+      <button class="btn btn-primary" ng-if="user" ng-click="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- VIEW OUTLET -->
+  <main ng-view></main>
+
+  <!-- FOOTER -->
+  <footer>
+    <strong>✚ CarePoint</strong>
+    <p>Your health, our priority. &copy; 2026 CarePoint</p>
+  </footer>
+
+  <!-- TEMPLATES ─────────────────────────────────────────────────────────── -->
+
+  <!-- HOME -->
+  <script type="text/ng-template" id="home.html">
+    <section class="hero">
+      <div class="hero-text">
+        <p class="eyebrow">YOUR HEALTH, OUR PRIORITY</p>
+        <h1>Good health starts<br>with the <em>right doctor.</em></h1>
+        <p class="hero-copy">Find trusted doctors, check available time slots and book your appointment in just a few clicks.</p>
+        <a href="#!/" class="btn btn-primary" style="text-decoration:none">Find a Doctor →</a>
+      </div>
+      <div class="hero-art">✚</div>
+    </section>
+
+    <section class="content">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">OUR SPECIALISTS</p>
+          <h2>Find your doctor</h2>
+        </div>
+        <span>{{(doctors | doctorSearch:searchText).length}} doctors available</span>
+      </div>
+
+      <input class="search" ng-model="searchText" placeholder="Search by doctor name, specialty or city...">
+
+      <div ng-if="loading" class="message">Loading doctors…</div>
+      <div ng-if="error" class="error">⚠ {{error}}</div>
+
+      <div class="doctor-grid" ng-if="!loading && !error">
+        <div class="doctor-card" ng-repeat="doc in doctors | doctorSearch:searchText">
+          <div class="avatar">{{initials(doc.name)}}</div>
+          <div class="doctor-info">
+            <span class="tag">{{doc.specialty}}</span>
+            <h3>{{doc.name}}</h3>
+            <p>{{doc.experience}} · {{doc.location}}</p>
+            <p class="rating">★ {{doc.rating}} <span>₹{{doc.fee}} fee</span></p>
+            <a href="#!/doctor/{{doc.id}}" class="button">Book Appointment →</a>
+          </div>
+        </div>
+
+        <div ng-if="(doctors | doctorSearch:searchText).length === 0" class="no-results">
+          <h3>No doctors found</h3>
+          <p>Try searching with a different name or specialty.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="how">
+      <p class="eyebrow">SIMPLE PROCESS</p>
+      <h2>How CarePoint works</h2>
+      <div class="steps">
+        <div>
+          <b>01</b>
+          <h3>Find a Doctor</h3>
+          <p>Search for trusted doctors based on specialty and location.</p>
+        </div>
+        <div>
+          <b>02</b>
+          <h3>Choose a Slot</h3>
+          <p>Check available appointment slots and pick a convenient time.</p>
+        </div>
+        <div>
+          <b>03</b>
+          <h3>Book Appointment</h3>
+          <p>Confirm your appointment and get ready for your consultation.</p>
+        </div>
+      </div>
+    </section>
+  </script>
+
+  <!-- DOCTOR DETAIL -->
+  <script type="text/ng-template" id="doctor.html">
+    <div class="content booking-page">
+      <a href="#!/" class="back">← Back to Doctors</a>
+
+      <div ng-if="error" class="error">⚠ {{error}}</div>
+
+      <div ng-if="doctor" class="booking-layout">
+        <!-- Doctor Profile -->
+        <div class="profile-panel">
+          <div class="avatar large">{{initials(doctor.name)}}</div>
+          <span class="tag">{{doctor.specialty}}</span>
+          <h1>{{doctor.name}}</h1>
+          <p>{{doctor.about}}</p>
+          <hr>
+          <p>📍 {{doctor.location}}</p>
+          <p>🩺 {{doctor.experience}} experience</p>
+          <p>⭐ Rating: {{doctor.rating}}</p>
+          <hr>
+          <h2>₹{{doctor.fee}}</h2>
+          <small>Consultation fee</small>
+        </div>
+
+        <!-- Booking Form -->
+        <div class="form-card">
+          <h2>Book Appointment</h2>
+
+          <div ng-if="!isLoggedIn" class="auth-notice">
+            <p>Please <a href="#!/auth">login or register</a> to book an appointment.</p>
+          </div>
+
+          <form ng-if="isLoggedIn" ng-submit="book()">
+            <label>
+              Patient Name *
+              <input type="text" ng-model="form.patientName" placeholder="Full name" required>
+            </label>
+            <label>
+              Email Address *
+              <input type="email" ng-model="form.email" placeholder="your@email.com" required>
+            </label>
+            <label>
+              Phone Number *
+              <input type="tel" ng-model="form.phone" placeholder="10-digit mobile number" required>
+            </label>
+            <label>
+              Appointment Date *
+              <input type="date" ng-model="form.date" min="{{today}}" required>
+            </label>
+            <label>Select Time Slot *</label>
+            <div class="slot-grid">
+              <button type="button" class="slot-btn"
+                ng-repeat="slot in doctor.slots"
+                ng-class="{'slot-selected': form.time === slot}"
+                ng-click="selectSlot(slot)">
+                {{slot}}
+              </button>
+            </div>
+
+            <div class="error" ng-if="error">⚠ {{error}}</div>
+            <div class="success" ng-if="success">✓ {{success}}</div>
+
+            <button type="submit" class="button submit" ng-disabled="busy">
+              {{busy ? 'Booking...' : 'Confirm Appointment →'}}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <!-- APPOINTMENTS -->
+  <script type="text/ng-template" id="appointments.html">
+    <div class="content">
+      <p class="eyebrow">MY BOOKINGS</p>
+      <h2>Your Appointments</h2>
+
+      <div ng-if="loading" class="message">Loading appointments…</div>
+      <div ng-if="error" class="error">⚠ {{error}}</div>
+
+      <div ng-if="!loading && appointments.length === 0 && !error" class="empty-state">
+        <p>🗓 You have no appointments yet.</p>
+        <a href="#!/" class="button">Find a Doctor →</a>
+      </div>
+
+      <div class="appt-grid">
+        <div class="appt-card" ng-repeat="appt in appointments">
+          <div class="appt-card-header">
+            <div class="avatar">{{appt.doctorName.split(' ').slice(1).join('').slice(0,2).toUpperCase()}}</div>
+            <div>
+              <h3>{{appt.doctorName}}</h3>
+              <span class="tag">{{appt.doctorSpecialty}}</span>
+            </div>
+            <span class="status-badge">{{appt.status || 'confirmed'}}</span>
+          </div>
+          <div class="appt-details-grid">
+            <span class="appt-label">📅 Date</span><span>{{formatDate(appt.date)}}</span>
+            <span class="appt-label">🕐 Time</span><span>{{appt.time}}</span>
+            <span class="appt-label">👤 Patient</span><span>{{appt.patientName}}</span>
+            <span class="appt-label">📞 Phone</span><span>{{appt.phone}}</span>
+          </div>
+          <button class="cancel-btn" ng-click="cancel(appt._id.toString())">Cancel Appointment</button>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <!-- AUTH -->
+  <script type="text/ng-template" id="auth.html">
+    <div class="auth-page">
+      <div class="auth-box">
+        <div class="auth-brand">✚ CarePoint</div>
+        <h2>{{isLogin ? 'Welcome Back!' : 'Create Account'}}</h2>
+        <p>{{isLogin ? 'Login to book your appointment' : 'Join CarePoint today'}}</p>
+
+        <form ng-submit="submit()">
+          <label ng-if="!isLogin">
+            Full Name *
+            <input type="text" ng-model="form.name" placeholder="Your full name" required>
+          </label>
+          <label>
+            Email Address *
+            <input type="email" ng-model="form.email" placeholder="your@email.com" required>
+          </label>
+          <label>
+            Password *
+            <input type="{{showPass ? 'text' : 'password'}}" ng-model="form.password" placeholder="Min. 6 characters" required>
+            <button type="button" class="show-pass-btn" ng-click="showPass=!showPass">{{showPass ? '🙈' : '👁'}}</button>
+          </label>
+          <label ng-if="!isLogin">
+            Confirm Password *
+            <input type="password" ng-model="form.confirmPassword" placeholder="Re-enter password">
+          </label>
+
+          <div class="auth-error" ng-if="error">⚠ {{error}}</div>
+          <div class="auth-success" ng-if="success">✓ {{success}}</div>
+
+          <button type="submit" class="btn btn-primary btn-full" ng-disabled="loading">
+            {{loading ? (isLogin ? 'Logging in...' : 'Creating account...') : (isLogin ? 'Login' : 'Create Account')}}
+          </button>
+        </form>
+
+        <p class="switch-line">
+          {{isLogin ? "Don't have an account?" : "Already have an account?"}}
+          <button class="link-btn" ng-click="switchMode()">{{isLogin ? 'Sign Up' : 'Login'}}</button>
+        </p>
+      </div>
+    </div>
+  </script>
+
+  <script src="app.js"></script>
+</body>
+</html>

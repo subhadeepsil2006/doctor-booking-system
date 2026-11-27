@@ -1,0 +1,245 @@
+.appointments-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 24px;
+}
+
+.appt-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.appt-header h2 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #173b36;
+    margin: 10px 0 10px;
+}
+
+.appt-header p {
+    color: #71827e;
+    font-size: 15px;
+}
+
+.appt-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px;
+    gap: 16px;
+    color: #71827e;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e8efed;
+    border-top-color: #008f83;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.appt-error {
+    background: #fff2f2;
+    color: #c0392b;
+    border: 1px solid #fcc;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.retry-btn {
+    background: #c0392b;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.appt-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border: 1px solid #e8efed;
+    border-radius: 20px;
+}
+
+.empty-icon {
+    font-size: 56px;
+    margin-bottom: 16px;
+}
+
+.appt-empty h3 {
+    font-size: 22px;
+    color: #173b36;
+    margin: 0 0 10px;
+}
+
+.appt-empty p {
+    color: #71827e;
+    font-size: 15px;
+    margin-bottom: 24px;
+}
+
+.find-btn {
+    display: inline-block;
+    background: #008f83;
+    color: white;
+    text-decoration: none;
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 15px;
+    transition: background 0.2s;
+}
+
+.find-btn:hover {
+    background: #00766d;
+}
+
+.appt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.appt-card {
+    background: white;
+    border: 1px solid #e8efed;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(22, 63, 50, 0.07);
+    transition: box-shadow 0.2s;
+}
+
+.appt-card:hover {
+    box-shadow: 0 8px 28px rgba(22, 63, 50, 0.12);
+}
+
+.appt-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.appt-avatar {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: #d9f0e8;
+    color: #087e72;
+    display: grid;
+    place-items: center;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.appt-doc-info h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #173b36;
+    margin: 0 0 5px;
+}
+
+.appt-specialty {
+    display: inline-block;
+    background: #e9f7f2;
+    color: #078779;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.appt-status {
+    margin-left: auto;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.appt-status.confirmed {
+    background: #e9f7f2;
+    color: #078779;
+}
+
+.appt-status.cancelled {
+    background: #fff2f2;
+    color: #c0392b;
+}
+
+.appt-details {
+    border-top: 1px solid #edf4f2;
+    border-bottom: 1px solid #edf4f2;
+    padding: 16px 0;
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.appt-detail-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13.5px;
+}
+
+.appt-detail-row span {
+    color: #71827e;
+}
+
+.appt-detail-row strong {
+    color: #29423e;
+    font-weight: 600;
+    text-align: right;
+    max-width: 55%;
+}
+
+.cancel-btn {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    color: #c0392b;
+    border: 1.5px solid #c0392b;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.cancel-btn:hover:not(:disabled) {
+    background: #fff2f2;
+}
+
+.cancel-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .appointments-section {
+        padding: 40px 16px;
+    }
+
+    .appt-grid {
+        grid-template-columns: 1fr;
+    }
+}
